@@ -20,7 +20,7 @@ CREATE TABLE Buchungen(
 	CheckinDatum date,
 	checkoutDatum date,
 	PRIMARY KEY (BuchungId),
-	FOREIGN KEY (GastId) REFERENCES Gäste(GastId),
+	CONSTRAINT FK_Buchungen_Gäste FOREIGN KEY (GastId) REFERENCES Gäste(GastId)
 );
 
 CREATE TABLE BuchungZimmer (
@@ -28,8 +28,8 @@ CREATE TABLE BuchungZimmer (
 	BuchungId int,
 	ZimmerNr int,
 	PRIMARY KEY (BZId),
-	FOREIGN KEY (BuchungId) REFERENCES Buchungen(BuchungId),
-	FOREIGN KEY (ZimmerNr) REFERENCES Zimmer(ZimmerNr)
+	CONSTRAINT FK_BuchungZimmer_Buchungen FOREIGN KEY (BuchungId) REFERENCES Buchungen(BuchungId),
+	CONSTRAINT FK_BuchungZimmer_Zimmer FOREIGN KEY (ZimmerNr) REFERENCES Zimmer(ZimmerNr)
 );
 
 CREATE TABLE Rechnungen (
@@ -39,7 +39,7 @@ CREATE TABLE Rechnungen (
 	GesamtBetrag int,
 	istBezahlt bit,
 	PRIMARY KEY (RechnungId),
-	FOREIGN KEY (BuchungId) REFERENCES Buchungen(BuchungId)
+	CONSTRAINT FK_Rechnungen_Buchungen FOREIGN KEY (BuchungId) REFERENCES Buchungen(BuchungId)
 );
 
 CREATE TABLE Arbeiter(
@@ -57,8 +57,8 @@ CREATE TABLE Zahlungen(
 	Betrag int,
 	ZahlungsDatum date,
 	PRIMARY KEY (ZahlungId),
-	FOREIGN KEY (RechnungId) REFERENCES Rechnungen(RechnungId),
-	FOREIGN KEY (ArbeiterId) REFERENCES Arbeiter(ArbeiterId)
+	CONSTRAINT FK_Zahlungen_Rechnungen FOREIGN KEY (RechnungId) REFERENCES Rechnungen(RechnungId),
+	CONSTRAINT FK_Zahlungen_Arbeiter FOREIGN KEY (ArbeiterId) REFERENCES Arbeiter(ArbeiterId)
 );
 
 CREATE TABLE Dienstleistungen(
@@ -74,8 +74,8 @@ CREATE TABLE DienstleistungsBuchungen(
 	BuchungsDatum date,
 	Betrag int,
 	PRIMARY KEY (GastId, DienstleistungId),
-	FOREIGN KEY (GastId) REFERENCES Gäste(GastId),
-	FOREIGN KEY (DienstleistungId) REFERENCES Dienstleistungen(DienstleistungId)
+	CONSTRAINT FK_DienstleistungsBuchungen_Gäste FOREIGN KEY (GastId) REFERENCES Gäste(GastId),
+	CONSTRAINT FK_DienstleistungsBuchungen_Dienstleistungen FOREIGN KEY (DienstleistungId) REFERENCES Dienstleistungen(DienstleistungId)
 );
 
 CREATE TABLE Bewertungen(
@@ -85,9 +85,9 @@ CREATE TABLE Bewertungen(
 	Bewertung int,
 	Kommentar varchar(256),
 	PRIMARY KEY (BewertungId),
-	FOREIGN KEY (GastId) REFERENCES Gäste(GastId),
-	FOREIGN KEY (DienstleistungId) REFERENCES Dienstleistungen(DienstleistungId)
-); 
+	CONSTRAINT FK_Bewertungen_Gäste FOREIGN KEY (GastId) REFERENCES Gäste(GastId),
+	CONSTRAINT FK_Bewertungen_Dienstleistungen FOREIGN KEY (DienstleistungId) REFERENCES Dienstleistungen(DienstleistungId)
+);
 
 CREATE TABLE Angebote(
 	AngebotId int NOT NULL,
@@ -97,5 +97,5 @@ CREATE TABLE Angebote(
 	BeginnDatum date,
 	EndeDatum date
 	PRIMARY KEY (AngebotId),
-	FOREIGN KEY (ZimmerNr) REFERENCES Zimmer(ZimmerNr)
+	CONSTRAINT FK_Angebote_Zimmer FOREIGN KEY (ZimmerNr) REFERENCES Zimmer(ZimmerNr)
 );
