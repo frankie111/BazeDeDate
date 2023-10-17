@@ -1,6 +1,6 @@
 CREATE TABLE Gäste(
 	GastId int NOT NULL,
-	CNP int,
+	CNP int UNIQUE,
 	FamilienName varchar(40),
 	Vorname varchar(40),
 	Email varchar(40),
@@ -24,10 +24,9 @@ CREATE TABLE Buchungen(
 );
 
 CREATE TABLE BuchungZimmer (
-	BZId int NOT NULL,
 	BuchungId int,
 	ZimmerNr int,
-	PRIMARY KEY (BZId),
+	PRIMARY KEY (BuchungId, ZimmerNr),
 	CONSTRAINT FK_BuchungZimmer_Buchungen FOREIGN KEY (BuchungId) REFERENCES Buchungen(BuchungId),
 	CONSTRAINT FK_BuchungZimmer_Zimmer FOREIGN KEY (ZimmerNr) REFERENCES Zimmer(ZimmerNr)
 );
@@ -37,7 +36,6 @@ CREATE TABLE Rechnungen (
 	BuchungId int,
 	Datum date,
 	GesamtBetrag int,
-	istBezahlt bit,
 	PRIMARY KEY (RechnungId),
 	CONSTRAINT FK_Rechnungen_Buchungen FOREIGN KEY (BuchungId) REFERENCES Buchungen(BuchungId)
 );
@@ -47,6 +45,7 @@ CREATE TABLE Arbeiter(
 	FamilienName varchar(40),
 	Vorname varchar(40),
 	Position varchar(40),
+	Geburtsdatum date,
 	PRIMARY KEY (ArbeiterId)
 );
 
@@ -73,9 +72,11 @@ CREATE TABLE DienstleistungsBuchungen(
 	DienstleistungId int,
 	BuchungsDatum date,
 	Betrag int,
+	BuchungId int,
 	PRIMARY KEY (GastId, DienstleistungId),
 	CONSTRAINT FK_DienstleistungsBuchungen_Gäste FOREIGN KEY (GastId) REFERENCES Gäste(GastId),
-	CONSTRAINT FK_DienstleistungsBuchungen_Dienstleistungen FOREIGN KEY (DienstleistungId) REFERENCES Dienstleistungen(DienstleistungId)
+	CONSTRAINT FK_DienstleistungsBuchungen_Dienstleistungen FOREIGN KEY (DienstleistungId) REFERENCES Dienstleistungen(DienstleistungId),
+	CONSTRAINT FK_DienstleistungsBuchungen_Buchungen FOREIGN KEY (BuchungId) REFERENCES Buchungen(BuchungId)
 );
 
 CREATE TABLE Bewertungen(
@@ -99,3 +100,4 @@ CREATE TABLE Angebote(
 	PRIMARY KEY (AngebotId),
 	CONSTRAINT FK_Angebote_Zimmer FOREIGN KEY (ZimmerNr) REFERENCES Zimmer(ZimmerNr)
 );
+
