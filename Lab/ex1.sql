@@ -43,20 +43,15 @@ INSERT INTO BuchungZimmer (BuchungId, ZimmerNr) VALUES
 (-1, 301);
 
 
-
 --1/d--------------------------------------------------------------
 --Edit + Delete
--- Ändere die Email-Adresse von Gästen mit dem Namen 'Müller', die entweder kein Email haben oder deren Email mit '@gmail.com' endet.
+--Edit the email of clients with the name "Müller", if they have an empty email or their email ends with "@gmail.com"
 UPDATE Gäste
 SET Email = 'neue.email@gmail.com'
 WHERE FamilienName = 'Müller' AND (Email IS NULL OR Email LIKE '%@gmail.com');
 
--- Lösche alle Zimmer, die zwischen den Nummern 102 und 104 liegen, nicht im Typ 'Suite' oder 'Deluxe' sind und deren Preis entweder NULL ist oder über 100 liegt.
+-- Delete all rooms with numbers between 102 and 104, which aren't of type "Suite" or "Deluxe" and the price of which is NULL or > 100
 DELETE FROM Zimmer
-WHERE ZimmerNr BETWEEN 102 AND 104 
+WHERE ZimmerNr BETWEEN 105 AND 107
 AND Typ NOT IN ('Suite', 'Deluxe') 
 AND (PreisProNacht IS NOT NULL AND PreisProNacht > 100);
-
-
-
---2--------------------------------------------------------------

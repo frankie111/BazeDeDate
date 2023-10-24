@@ -68,13 +68,11 @@ CREATE TABLE Dienstleistungen(
 );
 
 CREATE TABLE DienstleistungsBuchungen(
-	GastId int,
+	DienstleistungsBuchungId int,
 	DienstleistungId int,
-	BuchungsDatum date,
 	Betrag int,
 	BuchungId int,
-	PRIMARY KEY (GastId, DienstleistungId),
-	CONSTRAINT FK_DienstleistungsBuchungen_Gäste FOREIGN KEY (GastId) REFERENCES Gäste(GastId),
+	PRIMARY KEY (dienstleistungsBuchungId),
 	CONSTRAINT FK_DienstleistungsBuchungen_Dienstleistungen FOREIGN KEY (DienstleistungId) REFERENCES Dienstleistungen(DienstleistungId),
 	CONSTRAINT FK_DienstleistungsBuchungen_Buchungen FOREIGN KEY (BuchungId) REFERENCES Buchungen(BuchungId)
 );

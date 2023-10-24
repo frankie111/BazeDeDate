@@ -63,12 +63,12 @@ INSERT INTO Dienstleistungen (DienstleistungId, Typ, Preis) VALUES
 (5, 'Poolzugang', 5);
 
 -- DienstleistungsBuchungen
-INSERT INTO DienstleistungsBuchungen (GastId, DienstleistungId, BuchungsDatum, Betrag, BuchungId) VALUES
-(1, 1, '2023-01-02', 10, 1),
-(2, 2, '2023-01-06', 20, 2),
-(3, 3, '2023-01-11', 50, 3),
-(4, 4, '2023-01-16', 15, 4),
-(5, 5, '2023-01-21', 5, 5);
+INSERT INTO DienstleistungsBuchungen (DienstleistungsBuchungId, DienstleistungId, Betrag, BuchungId) VALUES
+(1, 1, 10, 1),
+(2, 2, 20, 2),
+(3, 3, 50, 3),
+(4, 4, 15, 4),
+(5, 5, 5, 5);
 
 -- Bewertungen
 INSERT INTO Bewertungen (BewertungId, GastId, DienstleistungId, Bewertung, Kommentar) VALUES
