@@ -54,4 +54,14 @@ FROM Zimmer AS Z
 LEFT JOIN BuchungZimmer AS BZ ON Z.ZimmerNr = BZ.ZimmerNr
 WHERE BZ.BuchungId IS NULL;
 
---9. 
+--9. Select all guests who have reviewed all services
+SELECT G.FamilienName, G.Vorname
+FROM Gäste AS G
+JOIN Bewertungen AS BR ON G.GastId = BR.GastId
+GROUP BY G.CNP, G.FamilienName, G.Vorname
+HAVING COUNT(BR.DienstleistungId) = ALL (
+	SELECT COUNT(D.DienstleistungId) 
+	FROM Dienstleistungen AS D
+	)
+
+--10. Select all guests who have not reviewed any services

@@ -111,10 +111,14 @@ INSERT INTO Bewertungen (BewertungId, GastId, DienstleistungId, Bewertung, Komme
 (2, 2, 2, 5, 'Ausgezeichnetes Abendessen'),
 (3, 3, 3, 3, 'Massage war okay'),
 (4, 4, 4, 5, 'Toller Fitnessraum'),
-(5, 5, 5, 4, 'Schöner Pool');
+(5, 5, 5, 4, 'Schöner Pool'),
+(6, 2, 3, 5, 'bam');
 
 INSERT INTO Bewertungen (BewertungId, GastId, DienstleistungId, Bewertung, Kommentar) VALUES
-(6, 2, 3, 5, 'bam');
+(7, 1, 2, 1, 'bewertung1'),
+(8, 1, 3, 2, 'bewertung2'),
+(9, 1, 4, 3, 'bewertung3'),
+(10, 1, 5, 4, 'bewertung4');
 
 -- Angebote
 INSERT INTO Angebote (AngebotId, ZimmerNr, Beschreibung, RabattProzentsatz, BeginnDatum, EndeDatum) VALUES
