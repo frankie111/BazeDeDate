@@ -28,7 +28,7 @@ LEFT JOIN Buchungen AS B ON G.GastId = B.GastId
 GROUP BY G.GastId, G.FamilienName, G.Vorname;
 
 --5. List the guests that have debt
-SELECT G.GastId, G.FamilienName, G.Vorname, R.GesamtBetrag-SUM(ISNULL(Z.Betrag, 0)) AS Schulden
+SELECT G.FamilienName, G.Vorname, R.GesamtBetrag-SUM(ISNULL(Z.Betrag, 0)) AS Schulden
 FROM Gäste AS G
 JOIN Buchungen AS B ON G.GastId = B.GastId
 JOIN Rechnungen AS R ON B.BuchungId = R.BuchungId
@@ -36,5 +36,22 @@ LEFT JOIN Zahlungen AS Z ON R.RechnungId = Z.RechnungId --LEFT JOIN ca sa apara 
 GROUP BY G.GastId, G.FamilienName, G.Vorname, R.RechnungId, R.GesamtBetrag
 HAVING SUM(ISNULL(Z.Betrag, 0)) < R.GesamtBetrag;
 
+--6. Select guests who have not booked any rooms
+SELECT G.FamilienName, G.Vorname
+FROM Gäste AS G
+LEFT JOIN Buchungen AS B ON G.GastId = B.GastId
+WHERE B.BuchungId IS NULL;
 
+--7. Show the average rating and the number of reviews for each service
+SELECT D.Typ, AVG(BR.Bewertung) AS DurchschnittsNote, COUNT(BR.Bewertung) AS BewertungsAnzahl
+FROM Dienstleistungen AS D
+LEFT JOIN Bewertungen AS BR ON D.DienstleistungId = BR.DienstleistungId
+GROUP BY D.DienstleistungId, D.Typ;
 
+--8. Select the rooms that have never been booked
+SELECT Z.ZimmerNr, Z.Typ
+FROM Zimmer AS Z
+LEFT JOIN BuchungZimmer AS BZ ON Z.ZimmerNr = BZ.ZimmerNr
+WHERE BZ.BuchungId IS NULL;
+
+--9. 

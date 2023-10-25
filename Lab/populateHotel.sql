@@ -32,6 +32,9 @@ INSERT INTO Zimmer (ZimmerNr, Typ, PreisProNacht) VALUES
 (104, 'Familienzimmer', 130),
 (105, 'Deluxe', 200);
 
+INSERT INTO Zimmer (ZimmerNr, Typ, PreisProNacht) VALUES
+(106, 'Suite', 150);
+
 -- Buchungen
 INSERT INTO Buchungen (BuchungId, GastId, CheckinDatum, checkoutDatum) VALUES
 (1, 1, '2023-01-01', '2023-01-05'),
@@ -109,6 +112,9 @@ INSERT INTO Bewertungen (BewertungId, GastId, DienstleistungId, Bewertung, Komme
 (3, 3, 3, 3, 'Massage war okay'),
 (4, 4, 4, 5, 'Toller Fitnessraum'),
 (5, 5, 5, 4, 'Schöner Pool');
+
+INSERT INTO Bewertungen (BewertungId, GastId, DienstleistungId, Bewertung, Kommentar) VALUES
+(6, 2, 3, 5, 'bam');
 
 -- Angebote
 INSERT INTO Angebote (AngebotId, ZimmerNr, Beschreibung, RabattProzentsatz, BeginnDatum, EndeDatum) VALUES
