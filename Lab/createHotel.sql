@@ -4,6 +4,7 @@ CREATE TABLE Gäste(
 	FamilienName varchar(40),
 	Vorname varchar(40),
 	Email varchar(40),
+	GeburtsDatum date,
 	PRIMARY KEY (GastId)
 );
 

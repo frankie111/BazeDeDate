@@ -1,10 +1,28 @@
 -- Gäste
-INSERT INTO Gäste (GastId, CNP, FamilienName, Vorname, Email) VALUES
-(1, 1001, 'Müller', 'Johannes', 'johannes.muller@example.com'),
-(2, 1002, 'Schmidt', 'Anna', 'anna.schmidt@example.com'),
-(3, 1003, 'Schneider', 'Lukas', 'lukas.schneider@example.com'),
-(4, 1004, 'Fischer', 'Sophie', 'sophie.fischer@example.com'),
-(5, 1005, 'Weber', 'Daniel', 'daniel.weber@example.com');
+INSERT INTO Gäste (GastId, CNP, FamilienName, Vorname, Email, GeburtsDatum) VALUES
+(1, 1001, 'Müller', 'Johannes', 'johannes.muller@example.com', '1985-08-12'),
+(2, 1002, 'Schmidt', 'Anna', 'anna.schmidt@example.com', '1990-03-25'),
+(3, 1003, 'Schneider', 'Lukas', 'lukas.schneider@example.com', '1979-11-08'),
+(4, 1004, 'Fischer', 'Sophie', 'sophie.fischer@example.com', '1988-06-17'),
+(5, 1005, 'Weber', 'Daniel', 'daniel.weber@example.com', '1995-02-04');
+
+INSERT INTO Gäste (GastId, CNP, FamilienName, Vorname, Email, GeburtsDatum) VALUES
+(6, 1006, 'Hans', 'Zimmer', 'zimmer.hans@gmail.com', '1982-09-29');
+
+ALTER TABLE Gäste
+ADD Geburtsdatum date;
+
+UPDATE Gäste
+SET Geburtsdatum = 
+    CASE
+        WHEN GastId = 1 THEN '1985-08-12'
+        WHEN GastId = 2 THEN '1990-03-25'
+        WHEN GastId = 3 THEN '1979-11-08'
+		WHEN GastId = 4 THEN '1988-06-17'
+		WHEN GastId = 5 THEN '1995-02-04'
+		WHEN GastId = 6 THEN '1982-09-29'
+    END;
+
 
 -- Zimmer
 INSERT INTO Zimmer (ZimmerNr, Typ, PreisProNacht) VALUES
@@ -22,6 +40,9 @@ INSERT INTO Buchungen (BuchungId, GastId, CheckinDatum, checkoutDatum) VALUES
 (4, 4, '2023-01-15', '2023-01-20'),
 (5, 5, '2023-01-20', '2023-01-25');
 
+INSERT INTO Buchungen (BuchungId, GastId, CheckinDatum, checkoutDatum) VALUES
+(6, 2, '2023-10-23', '2023-10-30');
+
 -- BuchungZimmer
 INSERT INTO BuchungZimmer (BuchungId, ZimmerNr) VALUES
 (1, 101),
@@ -30,6 +51,11 @@ INSERT INTO BuchungZimmer (BuchungId, ZimmerNr) VALUES
 (4, 104),
 (5, 105);
 
+INSERT INTO BuchungZimmer (BuchungId, ZimmerNr) VALUES
+(1, 102),
+(2, 103),
+(1, 104);
+
 -- Rechnungen
 INSERT INTO Rechnungen (RechnungId, BuchungId, Datum, GesamtBetrag) VALUES
 (1, 1, '2023-01-05', 250),
@@ -37,6 +63,9 @@ INSERT INTO Rechnungen (RechnungId, BuchungId, Datum, GesamtBetrag) VALUES
 (3, 3, '2023-01-15', 750),
 (4, 4, '2023-01-20', 650),
 (5, 5, '2023-01-25', 1000);
+
+INSERT INTO Rechnungen (RechnungId, BuchungId, Datum, GesamtBetrag) VALUES
+(6, 6, '2023-10-23', 450);
 
 -- Arbeiter
 INSERT INTO Arbeiter (ArbeiterId, FamilienName, Vorname, Position, Geburtsdatum) VALUES
@@ -69,6 +98,9 @@ INSERT INTO DienstleistungsBuchungen (DienstleistungsBuchungId, DienstleistungId
 (3, 3, 50, 3),
 (4, 4, 15, 4),
 (5, 5, 5, 5);
+
+INSERT INTO DienstleistungsBuchungen (DienstleistungsBuchungId, DienstleistungId, Betrag, BuchungId) VALUES
+(6, 5, 5, 1);
 
 -- Bewertungen
 INSERT INTO Bewertungen (BewertungId, GastId, DienstleistungId, Bewertung, Kommentar) VALUES
