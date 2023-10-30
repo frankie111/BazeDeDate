@@ -37,7 +37,9 @@ JOIN DienstleistungsBuchungen AS DB ON B.BuchungId = DB.BuchungId
 WHERE B.BuchungId IN (
     SELECT BZ.BuchungId
     FROM BuchungZimmer
+
 	UNION
+
     SELECT DB.BuchungId
     FROM DienstleistungsBuchungen
 );
@@ -52,11 +54,17 @@ LEFT JOIN Zahlungen AS Z ON R.RechnungId = Z.RechnungId --LEFT JOIN ca sa apara 
 GROUP BY G.GastId, G.FamilienName, G.Vorname, R.RechnungId, R.GesamtBetrag
 HAVING SUM(ISNULL(Z.Betrag, 0)) < R.GesamtBetrag;
 
---6. Select guests who have not booked any rooms
-SELECT G.FamilienName, G.Vorname
+--6. Find guests who have booked services with a cost higher than the average cost of services
+SELECT DISTINCT G.GastId , G.FamilienName, G.Vorname, D.Preis
 FROM Gäste AS G
-LEFT JOIN Buchungen AS B ON G.GastId = B.GastId
-WHERE B.BuchungId IS NULL;
+JOIN Buchungen AS B ON G.GastId = B.GastId
+JOIN DienstleistungsBuchungen AS DB ON B.BuchungId = DB.BuchungId
+JOIN Dienstleistungen AS D ON DB.DienstleistungId = D.DienstleistungId
+WHERE D.Preis > ANY (
+    SELECT AVG(D1.Preis)
+    FROM Dienstleistungen AS D1
+);
+
 
 --7. Show the average rating and the number of reviews for each service
 SELECT D.Typ, AVG(BR.Bewertung) AS DurchschnittsNote, COUNT(BR.Bewertung) AS BewertungsAnzahl
@@ -64,11 +72,15 @@ FROM Dienstleistungen AS D
 LEFT JOIN Bewertungen AS BR ON D.DienstleistungId = BR.DienstleistungId
 GROUP BY D.DienstleistungId, D.Typ;
 
---8. Select the rooms that have never been booked
-SELECT Z.ZimmerNr, Z.Typ
-FROM Zimmer AS Z
-LEFT JOIN BuchungZimmer AS BZ ON Z.ZimmerNr = BZ.ZimmerNr
-WHERE BZ.BuchungId IS NULL;
+--8. Find guests who have not booked any rooms
+SELECT G.FamilienName, G.Vorname
+FROM Gäste AS G
+WHERE G.GastId NOT IN (
+    SELECT DISTINCT B.GastId
+    FROM Buchungen AS B
+    JOIN BuchungZimmer AS BZ ON B.BuchungId = BZ.BuchungId
+);
+
 
 --9. Select all guests who have reviewed all services
 SELECT G.FamilienName, G.Vorname
@@ -80,4 +92,19 @@ HAVING COUNT(BR.DienstleistungId) = ALL (
 	FROM Dienstleistungen AS D
 	)
 
---10. Select all guests who have not reviewed any services
+--10. Find guests who have booked a specific service and a specific room type
+SELECT G.FamilienName, G.Vorname
+FROM Gäste AS G
+WHERE G.GastId IN (
+    SELECT B.GastId
+    FROM Buchungen AS B
+    JOIN DienstleistungsBuchungen AS DB ON B.BuchungId = DB.BuchungId
+    WHERE DB.DienstleistungId = (SELECT DienstleistungId FROM Dienstleistungen WHERE Typ = 'Massage')
+    
+    INTERSECT
+    
+    SELECT B.GastId
+    FROM Buchungen AS B
+    JOIN BuchungZimmer AS BZ ON B.BuchungId = BZ.BuchungId
+    WHERE BZ.ZimmerNr IN (SELECT ZimmerNr FROM Zimmer WHERE Typ = 'Deluxe' OR Typ = 'Suite')
+);

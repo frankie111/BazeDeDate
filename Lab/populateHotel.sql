@@ -4,10 +4,11 @@ INSERT INTO Gäste (GastId, CNP, FamilienName, Vorname, Email, GeburtsDatum) VALU
 (2, 1002, 'Schmidt', 'Anna', 'anna.schmidt@example.com', '1990-03-25'),
 (3, 1003, 'Schneider', 'Lukas', 'lukas.schneider@example.com', '1979-11-08'),
 (4, 1004, 'Fischer', 'Sophie', 'sophie.fischer@example.com', '1988-06-17'),
-(5, 1005, 'Weber', 'Daniel', 'daniel.weber@example.com', '1995-02-04');
+(5, 1005, 'Weber', 'Daniel', 'daniel.weber@example.com', '1995-02-04'),
+(6, 1006, 'Hans', 'Zimmer', 'zimmer.hans@gmail.com', '1982-09-29');
 
 INSERT INTO Gäste (GastId, CNP, FamilienName, Vorname, Email, GeburtsDatum) VALUES
-(6, 1006, 'Hans', 'Zimmer', 'zimmer.hans@gmail.com', '1982-09-29');
+(7, 1007, 'Kramer', 'John', 'john.kramer@gmail.com', '1972-12-10');
 
 ALTER TABLE Gäste
 ADD Geburtsdatum date;
