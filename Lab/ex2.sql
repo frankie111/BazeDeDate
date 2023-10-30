@@ -13,19 +13,35 @@ JOIN BuchungZimmer AS BZ ON B.BuchungId = Bz.BuchungId
 GROUP BY G.GastId, G.FamilienName, G.Vorname
 HAVING COUNT(BZ.ZimmerNr) > 1;
 
---3. Select guests that have booked either Massage or Poolzugang
+--3. Select the guests that have booked one of the two most popular services
 SELECT G.FamilienName, G.Vorname, D.Typ
 FROM Gäste AS G
 JOIN Buchungen AS B ON G.GastId = B.GastId
 JOIN DienstleistungsBuchungen AS DB ON B.BuchungId = DB.BuchungId
 JOIN Dienstleistungen AS D ON DB.DienstleistungId = D.DienstleistungId
-WHERE D.Typ IN ('Massage', 'Poolzugang');
+WHERE D.Typ IN (
+    SELECT TOP 2 D1.Typ
+    FROM Dienstleistungen AS D1
+    JOIN DienstleistungsBuchungen AS DB1 ON D1.DienstleistungId = DB1.DienstleistungId
+    GROUP BY D1.DienstleistungId, D1.Typ
+    ORDER BY COUNT(DB1.DienstleistungId) DESC
+);
 
---4. Show the number of bookings for each guest
-SELECT G.FamilienName, G.Vorname, COUNT(B.BuchungId) AS BuchungAnzahl
+
+--4. Find guests who have booked both rooms and services
+SELECT DISTINCT G.FamilienName, G.Vorname
 FROM Gäste AS G
-LEFT JOIN Buchungen AS B ON G.GastId = B.GastId
-GROUP BY G.GastId, G.FamilienName, G.Vorname;
+JOIN Buchungen AS B ON G.GastId = B.GastId
+JOIN BuchungZimmer AS BZ ON B.BuchungId = BZ.BuchungId
+JOIN DienstleistungsBuchungen AS DB ON B.BuchungId = DB.BuchungId
+WHERE B.BuchungId IN (
+    SELECT BZ.BuchungId
+    FROM BuchungZimmer
+	UNION
+    SELECT DB.BuchungId
+    FROM DienstleistungsBuchungen
+);
+
 
 --5. List the guests that have debt
 SELECT G.FamilienName, G.Vorname, R.GesamtBetrag-SUM(ISNULL(Z.Betrag, 0)) AS Schulden
