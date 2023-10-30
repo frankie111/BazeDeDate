@@ -1,9 +1,25 @@
---1. Select top 3 guests with the highest total amount, sorted in descending order by the total amount.
-SELECT TOP 3 G.FamilienName, G.Vorname, R.GesamtBetrag
+--1. Find guests who have booked 'Massage' but have not booked 'Poolzugang'
+SELECT G.FamilienName, G.Vorname
 FROM Gäste AS G
-JOIN Buchungen AS B ON G.GastId = B.GastId
-JOIN Rechnungen AS R ON B.BuchungId = R.BuchungId
-ORDER BY R.GesamtBetrag DESC;
+WHERE G.GastId IN (
+    SELECT B.GastId
+    FROM Buchungen AS B
+    JOIN DienstleistungsBuchungen AS DB ON B.BuchungId = DB.BuchungId
+    JOIN Dienstleistungen AS D ON DB.DienstleistungId = D.DienstleistungId
+    WHERE D.Typ = 'Massage'
+)
+
+EXCEPT
+
+SELECT G.FamilienName, G.Vorname
+FROM Gäste AS G
+WHERE G.GastId IN (
+    SELECT B.GastId
+    FROM Buchungen AS B
+    JOIN DienstleistungsBuchungen AS DB ON B.BuchungId = DB.BuchungId
+    JOIN Dienstleistungen AS D ON DB.DienstleistungId = D.DienstleistungId
+    WHERE D.Typ = 'Poolzugang'
+);
 
 --2. Select guests that have more than one room booked on the same reservation
 SELECT G.FamilienName, G.Vorname, COUNT(BZ.ZimmerNr) AS ZimmerAnzahl
@@ -76,11 +92,10 @@ GROUP BY D.DienstleistungId, D.Typ;
 SELECT G.FamilienName, G.Vorname
 FROM Gäste AS G
 WHERE G.GastId NOT IN (
-    SELECT DISTINCT B.GastId
+    SELECT B.GastId
     FROM Buchungen AS B
     JOIN BuchungZimmer AS BZ ON B.BuchungId = BZ.BuchungId
 );
-
 
 --9. Select all guests who have reviewed all services
 SELECT G.FamilienName, G.Vorname
