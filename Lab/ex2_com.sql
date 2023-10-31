@@ -1,4 +1,4 @@
---1.
+--1. Find guests who have booked 'Massage' but have not booked 'Poolzugang'
 SELECT G.FamilienName, G.Vorname
 FROM Gäste AS G
 WHERE G.GastId IN (
@@ -21,8 +21,7 @@ WHERE G.GastId IN (
     WHERE D.Typ = 'Poolzugang'
 );
 
-
---2.
+--2. Select guests that have more than one room booked on the same reservation
 SELECT G.FamilienName, G.Vorname, COUNT(BZ.ZimmerNr) AS ZimmerAnzahl
 FROM Gäste AS G
 JOIN Buchungen AS B on G.GastId = B.GastId
@@ -31,7 +30,7 @@ GROUP BY G.GastId, G.FamilienName, G.Vorname
 HAVING COUNT(BZ.ZimmerNr) > 1;
 
 
---3.
+--3. Select the guests that have booked one of the two most popular services
 SELECT G.FamilienName, G.Vorname, D.Typ
 FROM Gäste AS G
 JOIN Buchungen AS B ON G.GastId = B.GastId
@@ -46,7 +45,7 @@ WHERE D.Typ IN (
 );
 
 
---4. ce face?
+--4. Find guests who have booked both rooms and services
 SELECT DISTINCT G.FamilienName, G.Vorname
 FROM Gäste AS G
 JOIN Buchungen AS B ON G.GastId = B.GastId
@@ -63,24 +62,8 @@ WHERE B.BuchungId IN (
 );
 
 
-SELECT DISTINCT G.FamilienName, G.Vorname
-FROM Gäste AS G
-JOIN Buchungen AS B ON G.GastId = B.GastId
-JOIN BuchungZimmer AS BZ ON B.BuchungId = BZ.BuchungId
-JOIN DienstleistungsBuchungen AS DB ON B.BuchungId = DB.BuchungId
-WHERE B.BuchungId IN (
-    SELECT BZ.BuchungId
-    FROM BuchungZimmer
-
-	INTERSECT
-
-    SELECT DB.BuchungId
-    FROM DienstleistungsBuchungen
-);
-
-
---5.
-SELECT G.FamilienName, G.Vorname, R.GesamtBetrag-SUM(ISNULL(Z.Betrag, 0)) AS Schulden, R.GesamtBetrag AS Gesamtbetrag, SUM(ISNULL(Z.Betrag, 0)) AS bezahlt
+--5. List the guests that have debt -LJ
+SELECT G.FamilienName, G.Vorname, R.GesamtBetrag-SUM(ISNULL(Z.Betrag, 0)) AS Schulden
 FROM Gäste AS G
 JOIN Buchungen AS B ON G.GastId = B.GastId
 JOIN Rechnungen AS R ON B.BuchungId = R.BuchungId
@@ -89,8 +72,8 @@ GROUP BY G.GastId, G.FamilienName, G.Vorname, R.RechnungId, R.GesamtBetrag
 HAVING SUM(ISNULL(Z.Betrag, 0)) < R.GesamtBetrag;
 
 
---6.
-SELECT G.GastId , G.FamilienName, G.Vorname, D.Typ, D.Preis
+--6. Find guests who have booked services with a cost higher than the average cost of services
+SELECT G.GastId , G.FamilienName, G.Vorname, D.Preis
 FROM Gäste AS G
 JOIN Buchungen AS B ON G.GastId = B.GastId
 JOIN DienstleistungsBuchungen AS DB ON B.BuchungId = DB.BuchungId
@@ -101,14 +84,14 @@ WHERE D.Preis > ANY (
 );
 
 
---7.
+--7. Show the average rating and the number of reviews for each service
 SELECT D.Typ, AVG(BR.Bewertung) AS DurchschnittsNote, COUNT(BR.Bewertung) AS BewertungsAnzahl
 FROM Dienstleistungen AS D
 LEFT JOIN Bewertungen AS BR ON D.DienstleistungId = BR.DienstleistungId
 GROUP BY D.DienstleistungId, D.Typ;
 
 
---8.
+--8. Find guests who have not booked any rooms
 SELECT G.FamilienName, G.Vorname
 FROM Gäste AS G
 WHERE G.GastId NOT IN (
@@ -118,7 +101,7 @@ WHERE G.GastId NOT IN (
 );
 
 
---9.
+--9. Select all guests who have reviewed all services
 SELECT G.FamilienName, G.Vorname
 FROM Gäste AS G
 JOIN Bewertungen AS BR ON G.GastId = BR.GastId
@@ -129,7 +112,7 @@ HAVING COUNT(BR.DienstleistungId) = ALL (
 )
 
 
---10.
+--10. Find guests who have booked a specific service and a specific room type
 SELECT G.FamilienName, G.Vorname
 FROM Gäste AS G
 WHERE G.GastId IN (
