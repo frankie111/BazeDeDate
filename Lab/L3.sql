@@ -34,7 +34,8 @@ CREATE PROCEDURE CreateDefaultConstraint(
 ) AS
 BEGIN
 	DECLARE @SQL VARCHAR(MAX);
-	SET @SQL = 'ALTER TABLE ' + @TableName + ' ADD CONSTRAINT DF_' + @TableName + '_' + @ColumnName + ' DEFAULT ''' + @DefaultValue + ''' FOR ' + @ColumnName;
+	SET @SQL = 'ALTER TABLE ' + @TableName + ' ADD CONSTRAINT DF_' + @TableName + '_' + 
+			   @ColumnName + ' DEFAULT ''' + @DefaultValue + ''' FOR ' + @ColumnName;
 	PRINT @SQL;
 	EXEC (@SQL);
 END;
@@ -129,13 +130,36 @@ GO
 CREATE PROCEDURE AddForeignkeyConstraint(
 	@TableName VARCHAR(128),
 	@ColumnName VARCHAR(128),
-	@referencedTable VARCHAR(128),
-	@referencedColumn VARCHAR(128)
+	@ReferencedTable VARCHAR(128),
+	@ReferencedColumn VARCHAR(128)
 ) AS
 BEGIN
 	DECLARE @SQL VARCHAR(MAX);
 	SET @SQL = 'ALTER TABLE ' + @TableName + ' ADD CONSTRAINT FK_' + @TableName + '_' + @ColumnName +
-			   ' FOREIGN KEY (' + @ColumnName + ') REFERENCES ' + @referencedTable + '(' + @referencedColumn + ')';
+			   ' FOREIGN KEY (' + @ColumnName + ') REFERENCES ' + @ReferencedTable + '(' + @ReferencedColumn + ')';
 	PRINT @SQL;
 	EXEC(@SQL);
 END;
+
+GO
+
+CREATE PROCEDURE RevertAddForeignkeyConstraint(
+	@TableName VARCHAR(128),
+	@ColumnName VARCHAR(128)
+) AS
+BEGIN
+	DECLARE @SQL VARCHAR(MAX);
+	SET @SQL = 'ALTER TABLE ' + @TableName + ' DROP CONSTRAINT FK_' + @TableName + '_' + @ColumnName;
+	PRINT @SQL;
+	EXEC(@SQL);
+END;
+
+GO
+
+EXEC CreateTable 'TestTable', 'ID INT PRIMARY KEY, Name VARCHAR(128), Age INT';
+EXEC CreateTable 'TestTable2', 'ID INT PRIMARY KEY, Address VARCHAR(128)';
+
+EXEC AddForeignkeyConstraint 'TestTable', 'ID', 'TestTable2', 'ID';
+EXEC RevertAddForeignkeyConstraint 'TestTable', 'ID';
+EXEC DeleteTable 'TestTable';
+EXEC DeleteTable 'TestTable2';
