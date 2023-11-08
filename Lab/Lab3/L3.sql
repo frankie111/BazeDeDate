@@ -21,8 +21,7 @@ BEGIN
 	EXEC ChangeColumntype @TableName, @ColumnName, @OldDataType;
 END;
 
-EXEC ChangeColumntype 'Gäste', 'CNP', 'VARCHAR';
-EXEC RevertChangeColumnType 'Gäste', 'CNP', 'INT';
+DROP PROCEDURE RevertChangeColumnType;
 
 GO
 
@@ -52,9 +51,6 @@ BEGIN
 	PRINT @SQL;
 	EXEC(@SQL);
 END;
-
-EXEC CreateDefaultConstraint 'Arbeiter', 'GeburtsDatum', '2000-01-01';
-EXEC RevertCreateDefaultConstraint 'Arbeiter', 'GeburtsDatum';
 
 GO
 
@@ -87,11 +83,6 @@ END;
 
 GO
 
-EXEC CreateTable 'TestTable', 'ID INT PRIMARY KEY, Name VARCHAR(128), Age INT';
-EXEC DeleteTable 'TestTable';
-
-GO
-
 --1/d)
 CREATE PROCEDURE AddColumn(
 	@TableName VARCHAR(128),
@@ -117,12 +108,6 @@ BEGIN
 	PRINT @SQL;
 	EXEC(@SQL);
 END;
-
-EXEC CreateTable 'TestTable', 'ID INT PRIMARY KEY, Name VARCHAR(128), Age INT';
-EXEC AddColumn 'TestTable', 'Address', 'INT';
-
-EXEC RevertAddColumn 'TestTable', 'Address';
-EXEC DeleteTable 'TestTable';
 
 GO
 
@@ -155,6 +140,24 @@ BEGIN
 END;
 
 GO
+
+EXEC ChangeColumntype 'Zimmer', 'PreisProNacht', 'FLOAT';
+EXEC RevertChangeColumnType 'Zimmer', 'PreisProNacht', 'INT';
+
+EXEC ChangeColumntype 'TestTable', 'Name', 'CHAR(30)';
+
+EXEC CreateDefaultConstraint 'Arbeiter', 'GeburtsDatum', '2000-01-01';
+EXEC RevertCreateDefaultConstraint 'Arbeiter', 'GeburtsDatum';
+EXEC CreateDefaultConstraint 'TestTable', 'Name', 'abc';
+
+EXEC CreateTable 'TestTable', 'ID INT PRIMARY KEY, Name VARCHAR(128), Age INT';
+EXEC DeleteTable 'TestTable';
+
+EXEC CreateTable 'TestTable', 'ID INT PRIMARY KEY, Name VARCHAR(128), Age INT';
+EXEC AddColumn 'TestTable', 'Address', 'INT';
+
+EXEC RevertAddColumn 'TestTable', 'Address';
+EXEC DeleteTable 'TestTable';
 
 EXEC CreateTable 'TestTable', 'ID INT PRIMARY KEY, Name VARCHAR(128), Age INT';
 EXEC CreateTable 'TestTable2', 'ID INT PRIMARY KEY, Address VARCHAR(128)';
