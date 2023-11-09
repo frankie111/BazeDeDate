@@ -119,6 +119,17 @@ CREATE OR ALTER PROCEDURE ChangeColumnType(
 	@addToVersionHistory BIT = 1
 ) AS
 BEGIN
+	DECLARE @oldDataType as VARCHAR(128);
+	SET @oldDataType = (SELECT T.DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS T
+							WHERE TABLE_NAME = @tableName AND COLUMN_NAME = @columnName);
+
+	DECLARE @length as VARCHAR(128)
+	SET @length = (SELECT T.CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS T
+						WHERE TABLE_NAME = @tableName AND COLUMN_NAME = @columnName);
+
+	IF @length IS NOT NULL
+		SET @oldDataType = @oldDataType + '(' + @length + ')';
+
 	DECLARE @SQL VARCHAR(MAX);
 	SET @SQL = 'ALTER TABLE ' + @tableName + ' ALTER COLUMN ' + @columnName + ' ' + @newDataType;
 	PRINT @SQL;
@@ -132,7 +143,8 @@ BEGIN
 		INSERT INTO VersionParams (VersionId, ParamName, ParamValue) VALUES
 			(@versionId, 'tableName', @tableName),
 			(@versionId, 'columnName', @columnName),
-			(@versionId, 'newDataType', @newDataType);
+			(@versionId, 'newDataType', @newDataType),
+			(@versionId, 'oldDataType', @oldDataType);
 
 		UPDATE CurrentVersion SET CurrentVersion = @versionId;
 	END
@@ -146,7 +158,10 @@ CREATE OR ALTER PROCEDURE RevertChangeColumnType(
 	@oldDataType VARCHAR(128)
 ) AS
 BEGIN
-	EXEC ChangeColumnType @tableName, @columnName, @oldDataType, 0;
+	DECLARE @SQL VARCHAR(MAX);
+	SET @SQL = 'ALTER TABLE ' + @tableName + ' ALTER COLUMN ' + @columnName + ' ' + @oldDataType;
+	PRINT @SQL;
+	EXEC (@SQL);
 END;
 
 GO
@@ -249,6 +264,7 @@ BEGIN
 	DECLARE @defaultValue VARCHAR(128);
 	DECLARE @referencedTable VARCHAR(128);
 	DECLARE @referencedColumn VARCHAR(128);
+	DECLARE @newDataType VARCHAR(128);
 	DECLARE @oldDataType VARCHAR(128);
 
 	SELECT @currentVersion = CurrentVersion FROM CurrentVersion;
@@ -260,6 +276,7 @@ BEGIN
 			SELECT @procedureName = ProcedureName FROM VersionHistory WHERE VersionId = @currentVersion;
 			SELECT @tableName = ParamValue FROM VersionParams WHERE VersionId = @currentVersion AND ParamName = 'tableName';
 			SELECT @columnName = ParamValue FROM VersionParams WHERE VersionId = @currentVersion AND ParamName = 'columnName';
+			SELECT @oldDataType = ParamValue FROM VersionParams WHERE VersionId = @currentVersion AND ParamName = 'oldDataType';
 
 			DECLARE @rollBackProcedure VARCHAR(128) = 'Revert' + @procedureName;
 
@@ -304,7 +321,7 @@ BEGIN
 			SELECT @referencedTable = ParamValue FROM VersionParams WHERE VersionId = (@currentVersion + 1) AND ParamName = 'referencedTable';
 			SELECT @referencedColumn = ParamValue FROM VersionParams WHERE VersionId = (@currentVersion + 1) AND ParamName = 'referencedColumn';
 			SELECT @defaultValue = ParamValue FROM VersionParams WHERE VersionId = (@currentVersion + 1) AND ParamName = 'defaultValue';
-			SELECT @oldDataType = ParamValue FROM VersionParams WHERE VersionId = (@currentVersion + 1) AND ParamName = 'newDataType';
+			SELECT @newDataType = ParamValue FROM VersionParams WHERE VersionId = (@currentVersion + 1) AND ParamName = 'newDataType';
 
 			IF @procedureName = 'CreateTable'
 				BEGIN
@@ -316,7 +333,7 @@ BEGIN
 				END
 			ELSE IF @procedureName = 'ChangeColumnType'
 				BEGIN
-					EXEC @procedureName @tableName, @columnName, @columnType, 0;
+					EXEC @procedureName @tableName, @columnName, @newDataType, 0;
 				END
 			ELSE IF @procedureName = 'CreateDefaultConstraint'
 				BEGIN
