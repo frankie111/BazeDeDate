@@ -255,7 +255,37 @@ BEGIN
 	BEGIN
 		WHILE @currentVersion > @targetVersion
 		BEGIN
+			SELECT @procedureName = ProcedureName FROM VersionHistory WHERE VersionId = @currentVersion;
+			SELECT @tableName = ParamValue FROM VersionParams WHERE VersionId = @currentVersion AND ParamName = 'tableName';
+			SELECT @columnName = ParamValue FROM VersionParams WHERE VersionId = @currentVersion AND ParamName = 'columnName';
 
+			DECLARE @rollBackProcedure VARCHAR(128) = 'Revert' + @procedureName;
+
+			IF @procedureName = 'CreateTable'
+				BEGIN
+					EXEC @rollBackProcedure @tableName;
+				END
+			ELSE IF @procedureName = 'AddColumn'
+				BEGIN
+					EXEC @rollBackProcedure @tableName, @columnName;
+				END
+			ELSE IF @procedureName = 'ChangeColumnType'
+				BEGIN
+					EXEC @rollBackProcedure @tableName, @columnName, @oldDataType;
+				END
+			ELSE IF @procedureName = 'AddDefaultConstraint'
+				BEGIN
+					EXEC @rollBackProcedure @tableName, @columnName;
+				END
+			ELSE IF @procedureName = 'AddForeignkeyConstraint'
+				BEGIN
+					EXEC @rollBackProcedure @tableName, @columnName;
+				END
+
+			 
+			SET @currentVersion = @currentVersion - 1;
+			UPDATE CurrentVersion
+				SET CurrentVersion = @currentVersion;
 		END
 
 	END
@@ -263,10 +293,41 @@ BEGIN
 	ELSE IF @currentVersion < @targetVersion AND @targetVersion <= (SELECT MAX(VersionID) FROM VersionHistory)
 		WHILE @currentVersion < @targetVersion
 		BEGIN
-		
+			SELECT @procedureName = ProcedureName FROM VersionHistory WHERE VersionId = (@currentVersion + 1);
+			SELECT @tableName = ParamValue FROM VersionParams WHERE VersionId = (@currentVersion + 1) AND ParamName = 'tableName';
+			SELECT @columns = ParamValue FROM VersionParams WHERE VersionId = (@currentVersion + 1) AND ParamName = 'columns';
+			SELECT @columnName = ParamValue FROM VersionParams WHERE VersionId = (@currentVersion + 1) AND ParamName = 'columnName';
+			SELECT @columnType = ParamValue FROM VersionParams WHERE VersionId = (@currentVersion + 1) AND ParamName = 'columnType';
+			SELECT @referencedTable = ParamValue FROM VersionParams WHERE VersionId = (@currentVersion + 1) AND ParamName = 'referencedTable';
+			SELECT @referencedColumn = ParamValue FROM VersionParams WHERE VersionId = (@currentVersion + 1) AND ParamName = 'referencedColumn';
+			SELECT @defaultValue = ParamValue FROM VersionParams WHERE VersionId = (@currentVersion + 1) AND ParamName = 'defaultValue';
+
+			IF @procedureName = 'CreateTable'
+				BEGIN
+					EXEC @procedureName @tableName, @columns, 0;
+				END
+			ELSE IF @procedureName = 'AddColumn'
+				BEGIN
+					EXEC @procedureName @tableName, @columnName, @columnType, 0;
+				END
+			ELSE IF @procedureName = 'ChangeColumnType'
+				BEGIN
+					EXEC @procedureName @tableName, @columnName, @columnType, 0;
+				END
+			ELSE IF @procedureName = 'AddDefaultConstraint'
+				BEGIN
+					EXEC @procedureName @tableName, @columnName, @defaultValue, 0;
+				END
+			ELSE IF @procedureName = 'AddForeignkeyConstraint'
+				BEGIN
+					EXEC @procedureName @tableName, @columnName, @columnType, 0;
+				END
+			
+			SET @currentVersion = @currentVersion + 1;
+			UPDATE CurrentVersion
+				SET CurrentVersion = @currentVersion;
 		END
 	END
-
 END;
 
 
