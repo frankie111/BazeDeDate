@@ -23,9 +23,9 @@ GO
 CREATE OR ALTER PROCEDURE RevertSetUp
 AS
 BEGIN
-	DROP TABLE CurrentVersion;
-	DROP TABLE VersionHistory;
 	DROP TABLE VersionParams;
+	DROP TABLE VersionHistory;
+	DROP TABLE CurrentVersion;
 END;
 
 GO
@@ -66,6 +66,7 @@ BEGIN
 		SET @SQL = 'DROP TABLE ' + @tableName;
 		PRINT @SQL;
 		EXEC (@SQL);
+	END
 END;
 
 GO
@@ -120,6 +121,7 @@ CREATE OR ALTER PROCEDURE ChangeColumnType(
 BEGIN
 	DECLARE @SQL VARCHAR(MAX);
 	SET @SQL = 'ALTER TABLE ' + @tableName + ' ALTER COLUMN ' + @columnName + ' ' + @newDataType;
+	PRINT @SQL;
 	EXEC (@SQL);
 
 	IF @addToVersionHistory = 1
@@ -273,7 +275,7 @@ BEGIN
 				BEGIN
 					EXEC @rollBackProcedure @tableName, @columnName, @oldDataType;
 				END
-			ELSE IF @procedureName = 'AddDefaultConstraint'
+			ELSE IF @procedureName = 'CreateDefaultConstraint'
 				BEGIN
 					EXEC @rollBackProcedure @tableName, @columnName;
 				END
@@ -291,6 +293,7 @@ BEGIN
 	END
 
 	ELSE IF @currentVersion < @targetVersion AND @targetVersion <= (SELECT MAX(VersionID) FROM VersionHistory)
+	BEGIN
 		WHILE @currentVersion < @targetVersion
 		BEGIN
 			SELECT @procedureName = ProcedureName FROM VersionHistory WHERE VersionId = (@currentVersion + 1);
@@ -301,6 +304,7 @@ BEGIN
 			SELECT @referencedTable = ParamValue FROM VersionParams WHERE VersionId = (@currentVersion + 1) AND ParamName = 'referencedTable';
 			SELECT @referencedColumn = ParamValue FROM VersionParams WHERE VersionId = (@currentVersion + 1) AND ParamName = 'referencedColumn';
 			SELECT @defaultValue = ParamValue FROM VersionParams WHERE VersionId = (@currentVersion + 1) AND ParamName = 'defaultValue';
+			SELECT @oldDataType = ParamValue FROM VersionParams WHERE VersionId = (@currentVersion + 1) AND ParamName = 'newDataType';
 
 			IF @procedureName = 'CreateTable'
 				BEGIN
@@ -314,13 +318,13 @@ BEGIN
 				BEGIN
 					EXEC @procedureName @tableName, @columnName, @columnType, 0;
 				END
-			ELSE IF @procedureName = 'AddDefaultConstraint'
+			ELSE IF @procedureName = 'CreateDefaultConstraint'
 				BEGIN
 					EXEC @procedureName @tableName, @columnName, @defaultValue, 0;
 				END
 			ELSE IF @procedureName = 'AddForeignkeyConstraint'
 				BEGIN
-					EXEC @procedureName @tableName, @columnName, @columnType, 0;
+					EXEC @procedureName @tableName, @columnName, @referencedTable, @referencedColumn, 0;
 				END
 			
 			SET @currentVersion = @currentVersion + 1;
@@ -331,8 +335,25 @@ BEGIN
 END;
 
 
-
-
-
-
 EXEC Setup;
+
+EXEC CreateTable 'TestTable', 'Id INT PRIMARY KEY, Name VARCHAR(128)';
+EXEC AddColumn 'TestTable', 'Age', 'INT';
+EXEC ChangeColumnType 'TestTable', 'Age', 'FLOAT';
+EXEC CreateDefaultConstraint 'TestTable', 'Age', 0;
+EXEC CreateTable 'TestTable2', 'Id INT PRIMARY KEY, Address VARCHAR(128)';
+EXEC AddForeignkeyConstraint 'TestTable', 'Id', 'TestTable2', 'Id';
+
+EXEC GoToVersion 5;
+EXEC GoToVersion 4;
+EXEC GoToVersion 3;
+EXEC GoToVersion 0;
+
+EXEC GoToVersion 3;
+EXEC GoToVersion 4;
+EXEC GoToVersion 6;
+
+EXEC RevertSetUp;
+
+EXEC RevertCreateTable 'TestTable';
+EXEC RevertCreateTable 'TestTable2';
