@@ -351,26 +351,3 @@ BEGIN
 	END
 END;
 
-
-EXEC Setup;
-
-EXEC CreateTable 'TestTable', 'Id INT PRIMARY KEY, Name VARCHAR(128)';
-EXEC AddColumn 'TestTable', 'Age', 'INT';
-EXEC ChangeColumnType 'TestTable', 'Age', 'FLOAT';
-EXEC CreateDefaultConstraint 'TestTable', 'Age', 0;
-EXEC CreateTable 'TestTable2', 'Id INT PRIMARY KEY, Address VARCHAR(128)';
-EXEC AddForeignkeyConstraint 'TestTable', 'Id', 'TestTable2', 'Id';
-
-EXEC GoToVersion 5;
-EXEC GoToVersion 4;
-EXEC GoToVersion 3;
-EXEC GoToVersion 0;
-
-EXEC GoToVersion 3;
-EXEC GoToVersion 4;
-EXEC GoToVersion 6;
-
-EXEC RevertSetUp;
-
-EXEC RevertCreateTable 'TestTable';
-EXEC RevertCreateTable 'TestTable2';
