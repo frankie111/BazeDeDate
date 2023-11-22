@@ -9,7 +9,7 @@ BEGIN
 
 	DECLARE @pattern VARCHAR(20) = '%[^a-zA-Z]%';
 
-    IF @name LIKE '%[^a-zA-Z]%'
+    IF @name LIKE @pattern
 		SET @isValid = 0;
 
     RETURN @isValid;
@@ -43,5 +43,7 @@ BEGIN
 		PRINT 'Invalid Parameters. Insert failed.';
 	END
 END;
+
+SELECT * FROM Arbeiter;
 
 InsertDataIntoArbeiter 6, 'Mustermann', 'Max', 'Koch', '2000-03-12';
