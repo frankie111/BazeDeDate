@@ -39,7 +39,8 @@ END;
 
 
 INSERT INTO Arbeiter (ArbeiterId, FamilienName, Vorname, Position, Geburtsdatum)
-VALUES (6, 'Mustermann', 'Max', 'Manager', '1990-01-01');
+VALUES (6, 'Mustermann', 'Max', 'Manager', '1990-01-01'),
+	   (7, 'John', 'Doe', 'Koch', '1995-01-01');
 
 
 UPDATE Arbeiter
