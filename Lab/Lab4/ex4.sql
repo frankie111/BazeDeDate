@@ -5,10 +5,13 @@ AS
 BEGIN
     DECLARE @Gehalt DECIMAL(10, 2);
     DECLARE @NeuesGehalt DECIMAL(10, 2);
+	DECLARE @Position VARCHAR(40);
 
-    SELECT @Gehalt = Gehalt
+    SELECT @Gehalt = Gehalt, @Position = Position
     FROM Arbeiter
     WHERE ArbeiterId = @ArbeiterId;
+
+	--TODO: Customize increase in functie de Position
 
     SET @NeuesGehalt = @Gehalt * @Erhohungsfaktor;
 
@@ -20,6 +23,8 @@ BEGIN
 END;
 
 GO;
+
+select * from Arbeiter;
 
 DECLARE ArbeiterCursor CURSOR FOR
 SELECT ArbeiterId

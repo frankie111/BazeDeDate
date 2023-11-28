@@ -49,8 +49,10 @@ WHERE Position = 'Manager';
 
 
 DELETE FROM Arbeiter
-WHERE FamilienName = 'Mustermann';
+WHERE ArbeiterId in (5);
 
 SELECT * FROM ChangeLog;
+
+SELECT * FROM Arbeiter;
 
 DELETE ChangeLog;
