@@ -3,10 +3,6 @@ CREATE TABLE Ta (
 	a2 INT UNIQUE,
 );
 
-DROP TABLE Tc;
-DROP TABLE Ta;
-DROP TABLE Tb;
-
 CREATE TABLE Tb (
 	idB INT PRIMARY KEY,
 	b2 INT,
@@ -29,7 +25,7 @@ BEGIN
     WHILE @counterA <= 10000
     BEGIN
         INSERT INTO Ta (idA, a2)
-        VALUES (@counterA, @counterA);
+        VALUES (@counterA, @counterA * 2);
 
         SET @counterA = @counterA + 1;
     END
@@ -39,7 +35,7 @@ BEGIN
     WHILE @counterB <= 3000
     BEGIN
         INSERT INTO Tb (idB, b2, b3)
-        VALUES (@counterB, @counterB, @counterB + 10000);
+        VALUES (@counterB, @counterB * 3, @counterB + 10000);
 
         SET @counterB = @counterB + 1;
     END
@@ -60,4 +56,14 @@ END;
 
 EXEC PopulateTables;
 
+SELECT * FROM Ta;
+SELECT * FROM Tb;
 SELECT * FROM Tc;
+
+SELECT COUNT(*) FROM Ta;
+SELECT COUNT(*) FROM Tb;
+SELECT COUNT(*) FROM Tc;
+
+DROP TABLE Tc;
+DROP TABLE Ta;
+DROP TABLE Tb;
