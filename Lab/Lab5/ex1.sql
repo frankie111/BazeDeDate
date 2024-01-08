@@ -1,7 +1,9 @@
 CREATE TABLE Ta (
 	idA INT PRIMARY KEY,
 	a2 INT UNIQUE,
+	a3 INT
 );
+
 
 CREATE TABLE Tb (
 	idB INT PRIMARY KEY,
@@ -24,8 +26,8 @@ BEGIN
 
     WHILE @counterA <= 10000
     BEGIN
-        INSERT INTO Ta (idA, a2)
-        VALUES (@counterA, @counterA * 2);
+        INSERT INTO Ta (idA, a2, a3)
+        VALUES (@counterA, @counterA * 2, @counterA + 123);
 
         SET @counterA = @counterA + 1;
     END
