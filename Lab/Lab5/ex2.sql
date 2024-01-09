@@ -1,24 +1,24 @@
 --2/a)
 EXEC sys.sp_helpindex @objname = N'dbo.Ta';
 
-SELECT * FROM Ta WHERE idA = 500; --Clustered Seek
+SELECT * FROM Ta WHERE idA = 500;
 
-SELECT * FROM Ta WHERE a2 BETWEEN 1000 AND 2000; --NonClustered Seek
+SELECT idA, a2 FROM Ta WHERE a2 BETWEEN 1000 AND 2000;
 
-SELECT a2 FROM Ta WHERE a2 < 5000 ORDER BY idA; --Clustered Scan
+SELECT a2 FROM Ta WHERE a2 < 5000 ORDER BY idA;
 
-SELECT * FROM Ta ORDER BY a2 DESC; --NonClustered Scan
+SELECT idA, a2 FROM Ta ORDER BY a2;
 
 
 --2/b)
-SELECT * FROM Ta WHERE a2 = 1000; --NonClustered Seek, Key Lookup
+SELECT idA, a2, a3 FROM Ta WHERE a2 = 1000;
 
 
 --2/c)
 EXEC sys.sp_helpindex @objname = N'dbo.Tb';
 
-SELECT * FROM Tb WHERE b2 = 201; --Clustered Scan, 0.01
-CREATE NONCLUSTERED INDEX I_b2 ON Tb(b2) INCLUDE (b3); --NonClustered Seek, 0.003
+SELECT idB, b2, b3 FROM Tb WHERE b2 = 201;
+CREATE NONCLUSTERED INDEX I_b2 ON Tb(b2) INCLUDE (b3);
 DROP INDEX Tb.I_b2;
 
 
