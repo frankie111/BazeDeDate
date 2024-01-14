@@ -20,12 +20,13 @@ CREATE TABLE KundenKonten(
 CREATE TABLE Kredite(
 	kreditId int NOT NULL PRIMARY KEY,
 	wahrung varchar(3),
-	laufzeit int
+	laufzeit int,
+	betrag int,
+	rate int
 );
 
 CREATE TABLE KundenKredite(
 	kundeId int FOREIGN KEY REFERENCES Kunden(kundeId),
-	kreditId int FOREIGN KEY REFERENCES Kredite(kreditId),
-	betrag int,
-	rate int
+	kreditId int FOREIGN KEY REFERENCES Kredite(kreditId)
 );
+
