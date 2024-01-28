@@ -1,0 +1,3 @@
+funktionale Abhängigkeiten
+BCNF - Korollar
+Erweiterbares Hashing
