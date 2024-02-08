@@ -1,3 +1,7 @@
 funktionale Abhängigkeiten
 BCNF - Korollar
 Erweiterbares Hashing
+Indexe
+Normalformen (dritten Normalform, 2NF, 3NF, BCNF)
+Relationale Algebra
+B-Bäume
